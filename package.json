@@ -1,0 +1,14 @@
+{
+  "name": "proxy-pre-mock",
+  "version": "0.0.1",
+  "description": "简单的mock插件，快速实现mock开发需求，mock数据与项目代码分开",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "manguogogogo",
+  "license": "ISC",
+  "dependencies": {
+    "chokidar": "^3.6.0"
+  }
+}
