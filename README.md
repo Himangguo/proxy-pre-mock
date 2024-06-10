@@ -30,7 +30,7 @@ webpack5Middleware接受一个参数：mock文件所在的目录（可以是相�
 ```js
 const { addMock } = require('proxy-pre-mock')
 
-addMock('/api/check', 'get', true,(req)=>{
+addMock('/api/check', 'get',(req)=>{
     return {
         code: 200,
         data: {
@@ -43,7 +43,6 @@ addMock('/api/check', 'get', true,(req)=>{
 addMock支持四个参数：
 - path：请求地址pathname
 - method：请求方法
-- enable：是否启用此mock，如果不需要mock了，将此参数设置为false即可（**如果需要禁用mock设置为false即可，注释或删除文件不会生效**）
 - handle：响应体函数
 ### b、在vite项目中
 >vite5Plugin方法和webpack版本的大致相同，只是在vite5中是以插件的形式启动的

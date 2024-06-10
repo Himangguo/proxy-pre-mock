@@ -6,6 +6,10 @@
   "scripts": {
   },
   "author": "manguogogogo",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:Himangguo/proxy-pre-mock.git"
+  },
   "license": "ISC",
   "dependencies": {
     "chokidar": "^3.6.0"
