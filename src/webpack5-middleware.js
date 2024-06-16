@@ -17,9 +17,11 @@ function webpack5Middleware(mockDir) {
             // 2.找到命中的mock路由
             const handle = getMockHandle(pathname, method)
             if (handle) {
-                const result = handle(req)
-                // 命中返回mock数据
-                res.json(result)
+                const result = handle(req, res)
+                if (!res.finished && result) {
+                    // 命中返回mock数据
+                    res.json(result)
+                }
             } else {
                 // 没命中，走devServer的proxy正向代理逻辑
                 next()

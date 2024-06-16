@@ -1,7 +1,7 @@
 const path = require('path')
 const {watchDir, getMockHandle} = require('./app')
 
-function vite5Plugin (mockDir){
+function vite5Plugin(mockDir) {
     if (!path.isAbsolute(mockDir)) {
         mockDir = path.resolve(process.cwd(), mockDir)
     }
@@ -18,11 +18,13 @@ function vite5Plugin (mockDir){
                 // 2.找到命中的mock路由
                 const handle = getMockHandle(pathname, method)
                 if (handle) {
-                    const result = handle(req)
-                    // 命中返回mock数据
                     // 在vite5环境下运行时报错res没有json这个方法,所以改成res.end
                     res.setHeader('Content-Type', 'application/json');
-                    res.end(JSON.stringify(result))
+                    const result = handle(req, res)
+                    if (!res.finished && result) {
+                        // 命中返回mock数据
+                        res.end(JSON.stringify(result))
+                    }
                 } else {
                     // 没命中，走devServer的proxy正向代理逻辑
                     next()

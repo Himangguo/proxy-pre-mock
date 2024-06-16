@@ -1,35 +1,72 @@
 const path = require('path')
 const chokidar = require('chokidar')
+
+const {bundleRequire, JS_EXT_RE} = require('bundle-require')
 const {isString, isFunction} = require('./utils')
 const handleMap = new Map() // method-path -> handle
 const pathMockMap = new Map() // pathname -> mock key list
 
+const getRandomId = () => {
+    return Math.random().toString(36).substring(2, 15);
+}
+
+const getOutputFile = (filepath, format) => filepath.replace(
+    JS_EXT_RE,
+    `.bundled_${getRandomId()}.${format === "esm" ? "mjs" : "cjs"}`
+)
+
+async function resolveModule(filepath) {
+    await bundleRequire({
+        filepath,
+        getOutputFile
+    })
+}
+
+// 加载模块任务列表
+const loadTask = {
+    queue: [],
+    finished: true
+}
+
+// 记录正在加载的模块
 const CUR_FILE = {
     path: null,
     cache: []
 }
 
-// 加载mock路由
-function loadMockRoute(filePath) {
-    if (!filePath) return
-    if (require.cache[filePath]) {
-        // 实现热更新
-        delete require.cache[filePath]
+function addLoadTask(filePath) {
+    if (!filePath || path.extname(filePath) !== '.js') return
+    loadTask.queue.push(filePath)
+}
+
+async function runLoadTask() {
+    if (!loadTask.finished) return
+    loadTask.finished = false
+    while(loadTask.queue.length) {
+        const filePath = loadTask.queue.shift()
+        await loadMockRoute(filePath)
     }
-    // 非法文件类型直接return
-    if (path.extname(filePath) !== '.js') return
+    loadTask.finished = true
+}
+
+
+// 加载mock路由
+async function loadMockRoute(filePath) {
+    console.log('模块加载开始：', filePath)
+    CUR_FILE.path = filePath
+    CUR_FILE.cache = []
     try {
-        CUR_FILE.path = filePath
-        CUR_FILE.cache = []
-        require(filePath)
+        await resolveModule(filePath)
         checkNeedDelMock()
     } catch (err) {
         throw new Error(err)
-    } finally {
-        CUR_FILE.path = null
-        CUR_FILE.cache = []
     }
+    CUR_FILE.path = null
+    CUR_FILE.cache = []
+    console.log('模块加载完成：', filePath)
+
 }
+
 
 // 监听并加载目录文件
 function watchDir(path) {
@@ -39,15 +76,14 @@ function watchDir(path) {
 
     watcher
         .on('add', path => {
-            console.log(`[proxy-pre-mock]${path} add`)
-            loadMockRoute(path)
+            addLoadTask(path)
+            runLoadTask().then(res => {})
         })
         .on('change', path => {
-            console.log(`[proxy-pre-mock]${path} update`)
-            loadMockRoute(path)
+            addLoadTask(path)
+            runLoadTask().then(res => {})
         })
         .on('unlink', path => {
-            console.log(`[proxy-pre-mock]${path} delete`)
             pathMockCacheDelete(path)
 
         })
@@ -69,7 +105,7 @@ function checkNeedDelMock() {
 function pathMockCacheDelete(filePath) {
     // 非法文件类型直接return
     if (path.extname(filePath) !== '.js') return
-
+    console.log('模块已删除：', filePath)
     // 将path文件里面的mock删除
     const mockKeyList = pathMockMap.get(filePath)
     if (mockKeyList && mockKeyList.length) {
@@ -87,7 +123,7 @@ function addMock(path, method, handle) {
     }
 
     const key = `${method.toUpperCase()}-${path}`
- 
+
     CUR_FILE.cache.push(key)
     handleMap.set(key, handle)
 }
