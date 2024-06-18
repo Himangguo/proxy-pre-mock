@@ -42,9 +42,16 @@ function addLoadTask(filePath) {
 async function runLoadTask() {
     if (!loadTask.finished) return
     loadTask.finished = false
-    while(loadTask.queue.length) {
+    while (loadTask.queue.length) {
         const filePath = loadTask.queue.shift()
-        await loadMockRoute(filePath)
+        console.log('模块加载开始：', filePath)
+        try {
+            await loadMockRoute(filePath)
+            console.log('模块加载完成：', filePath)
+        } catch (error) {
+            console.log('模块加载失败：', filePath)
+            console.log(error)
+        }
     }
     loadTask.finished = true
 }
@@ -52,7 +59,6 @@ async function runLoadTask() {
 
 // 加载mock路由
 async function loadMockRoute(filePath) {
-    console.log('模块加载开始：', filePath)
     CUR_FILE.path = filePath
     CUR_FILE.cache = []
     try {
@@ -63,8 +69,6 @@ async function loadMockRoute(filePath) {
     }
     CUR_FILE.path = null
     CUR_FILE.cache = []
-    console.log('模块加载完成：', filePath)
-
 }
 
 
@@ -77,11 +81,13 @@ function watchDir(path) {
     watcher
         .on('add', path => {
             addLoadTask(path)
-            runLoadTask().then(res => {})
+            runLoadTask().then(res => {
+            })
         })
         .on('change', path => {
             addLoadTask(path)
-            runLoadTask().then(res => {})
+            runLoadTask().then(res => {
+            })
         })
         .on('unlink', path => {
             pathMockCacheDelete(path)
