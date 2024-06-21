@@ -1,5 +1,6 @@
 const path = require('path')
-const {watchDir, getMockHandle} = require('./app')
+const {getMockHandle} = require('./app')
+const {watchDir} = require('./watch')
 
 function vite5Plugin(mockDir) {
     if (!path.isAbsolute(mockDir)) {

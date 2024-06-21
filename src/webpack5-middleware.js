@@ -1,5 +1,6 @@
 const path = require('path')
-const {watchDir, getMockHandle} = require('./app')
+const {getMockHandle} = require('./app')
+const {watchDir} = require('./watch')
 
 function webpack5Middleware(mockDir) {
     if (!path.isAbsolute(mockDir)) {

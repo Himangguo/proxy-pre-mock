@@ -1,6 +1,6 @@
 {
   "name": "proxy-pre-mock",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "description": "基于webpack、vite框架的本地mock服务",
   "main": "index.js",
   "scripts": {},
