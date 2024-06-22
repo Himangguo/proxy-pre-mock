@@ -16,12 +16,12 @@ async function runLoadTask() {
     loadTask.finished = false
     while (loadTask.queue.length) {
         const filePath = loadTask.queue.shift()
-        console.log('模块加载开始：', filePath)
+        console.log('【proxy-pre-mock】模块加载开始：', filePath)
         try {
             await loadMockRoute(filePath)
-            console.log('模块加载完成：', filePath)
+            console.log('【proxy-pre-mock】模块加载完成：', filePath)
         } catch (error) {
-            console.log('模块加载失败：', filePath)
+            console.log('【proxy-pre-mock】模块加载失败：', filePath)
             console.log(error)
         }
     }

@@ -21,7 +21,7 @@ function watchDir(path) {
             pathMockCacheDelete(path)
 
         })
-        .on('error', error => console.log(`[proxy-pre-mock]Watcher error: ${error}`));
+        .on('error', error => console.log(`【proxy-pre-mock】Watcher error: ${error}`));
 }
 
 

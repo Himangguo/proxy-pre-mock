@@ -41,7 +41,7 @@ function checkNeedDelMock() {
 function pathMockCacheDelete(filePath) {
     // 非法文件类型直接return
     if (path.extname(filePath) !== '.js') return
-    console.log('模块已删除：', filePath)
+    console.log('【proxy-pre-mock】模块已删除：', filePath)
     // 将path文件里面的mock删除
     const mockKeyList = pathMockMap.get(filePath)
     if (mockKeyList && mockKeyList.length) {
