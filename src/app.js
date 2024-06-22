@@ -1,6 +1,6 @@
 const path = require('path')
-const { resolveModule } = require('./resolve')
-const { MockMethodList } = require('./enum')
+const {resolveModule} = require('./resolve')
+const {MockMethodList} = require('./enum')
 
 const {isString, isFunction} = require('./utils')
 const handleMap = new Map() // method-path -> handle
@@ -50,7 +50,8 @@ function pathMockCacheDelete(filePath) {
     }
 }
 
-function addMockCore(path, method, handle) {
+function addMockCore(path, method, handle, mockSwitch = true) {
+    if (!mockSwitch) return
     if (!isString(path) || !isString(method) || !isFunction(handle)) {
         console.error(`[proxy-pre-mock][${method}-${path}]Please enter valid parameters: path: String, method: String, handle: Function`)
         return
@@ -62,17 +63,15 @@ function addMockCore(path, method, handle) {
     handleMap.set(key, handle)
 }
 
-function addMock(path, method, handle) {
-    return addMockCore(path, method, handle)
+function addMock(path, method, handle, mockSwitch) {
+    return addMockCore(path, method, handle, mockSwitch)
 }
 
-MockMethodList.forEach(method=>{
-    addMock[method] = function (path, handle) {
-        return addMockCore(path, method, handle)
+MockMethodList.forEach(method => {
+    addMock[method] = function (path, handle, mockSwitch) {
+        return addMockCore(path, method, handle, mockSwitch)
     }
 })
-
-
 
 function getMockHandle(path, method) {
     return handleMap.get(`${method.toUpperCase()}-${path}`)
