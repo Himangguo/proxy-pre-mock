@@ -16,8 +16,9 @@ function webpack5Middleware(mockDir) {
             const pathname = req._parsedUrl.pathname
             const method = req.method
             // 2.找到命中的mock路由
-            const handle = getMockHandle(pathname, method)
+            const {handle, params} = getMockHandle(pathname, method) || {}
             if (handle) {
+                req.params = params
                 const result = handle(req, res)
                 if (!res.finished && result) {
                     // 命中返回mock数据

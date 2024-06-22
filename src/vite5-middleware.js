@@ -17,8 +17,9 @@ function vite5Plugin(mockDir) {
                 const pathname = req._parsedUrl.pathname
                 const method = req.method
                 // 2.找到命中的mock路由
-                const handle = getMockHandle(pathname, method)
+                const {handle, params} = getMockHandle(pathname, method) || {}
                 if (handle) {
+                    req.params = params
                     // 在vite5环境下运行时报错res没有json这个方法,所以改成res.end
                     res.setHeader('Content-Type', 'application/json');
                     const result = handle(req, res)

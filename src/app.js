@@ -1,4 +1,5 @@
 const path = require('path')
+const {pathToRegexp} = require('path-to-regexp')
 const {resolveModule} = require('./resolve')
 const {MockMethodList} = require('./enum')
 
@@ -74,7 +75,24 @@ MockMethodList.forEach(method => {
 })
 
 function getMockHandle(path, method) {
-    return handleMap.get(`${method.toUpperCase()}-${path}`)
+    // 由于path可能存在动态路由参数，所以需要匹配一下
+    for (const key of handleMap.keys()) {
+        const [_, m, p] = key.match(/([^-/]+)-(.+)/)
+        const regexp = pathToRegexp(p);
+        const match = regexp.exec(path);
+
+        if (method.toUpperCase() === m.toUpperCase() && match) {
+            // 如果路由匹配上了
+            const params = {};
+            regexp.keys.forEach((key, index) => {
+                params[key.name] = match[index + 1];
+            });
+            return {
+                params,
+                handle: handleMap.get(key)
+            }
+        }
+    }
 }
 
 module.exports = {
